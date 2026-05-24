@@ -186,6 +186,8 @@ class City(object):
             groups_file (str): file within envirnoment folder that contains group membership for each grid square.
             ignore_existing_lines (boolean): if set to true, the environment will not load the current existing lines of the environment (check config.txt).
         """
+        import pathlib
+        env_path = pathlib.Path(env_path)
         super(City, self).__init__()
 
         # read configuration file that contains basic parameters for the City.

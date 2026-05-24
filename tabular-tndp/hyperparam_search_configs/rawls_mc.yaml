@@ -1,0 +1,35 @@
+method: random
+metric:
+  goal: maximize
+  name: Average-Test-Reward
+parameters:
+  alpha:
+    values: [0.1, 0.2, 0.3, 0.4, 0.5]
+  gamma:
+    value: 1
+  train_episodes:
+    value: 25000
+  epsilon_warmup_steps:
+    values: [0, 3000, 5000]
+  epsilon_decay_steps:
+    values: [10000, 12000, 14000, 16000, 18000, 20000, 23000]
+  q_start_initial_value:
+    value: 0
+  q_initial_value:
+    value: 0
+  ucb_c_qstart:
+    value: 0
+  ucb_c_q:
+    value: 0
+  initial_epsilon:
+    value: 1.0
+  final_epsilon:
+    value: 0.01
+  test_episodes:
+    value: 1
+  exploration_type:
+    value: 'egreedy'
+  update_method:
+    value: 'mc'
+  seed:
+    value: 10

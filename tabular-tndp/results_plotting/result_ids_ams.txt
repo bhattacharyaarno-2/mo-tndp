@@ -1,0 +1,38 @@
+[
+   {
+      "reward_type": "max_efficiency",
+      "models": [
+         {"name": "GS", "run_ids": ["mnz9g4so"]},
+         {"name": "GA", "run_ids": ["ga3mv3ag", "x26l3r4i", "3g4ki5ar", "7pset9fl", "yedgsgqp", "uq7fbrab", "1gc6g3w8", "hajrqp1c", "kyhtt01m", "alsslfhp"]},
+         {"name": "DeepRL", "run_ids": ["1se01ud5", "5sif9a7w", "z4a9e3fw", "6ot0zo6e", "odcongwb", "", "", "", "", ""]},
+         {"name": "TabularMNEP", "run_ids": ["km36q0v9", "dp44sk12", "ahlyr6dg", "o6l1x0ji", "stxp0y2q", "f95n5swz", "8obna2lx", "8ag0ltmx", "xwtb1kdz", "0btcu8jr"]}
+      ]
+   },
+   {
+      "reward_type": "rawls",
+      "models": [
+         {"name": "GS", "run_ids": ["qvuvpppw"]},
+         {"name": "GA", "run_ids": ["sfsmkrm7", "ppnxpuh2", "38jusdle", "pb4ze120", "hp2jo2zv", "9trdja36", "d5mmi7f5", "yhuhisia", "sf9ng9f9", "8kkqqd2t"]},
+         {"name": "DeepRL", "run_ids": ["xz7id1ah", "9crampld", "qwzu05ht", "425us7iw", "fxnv8t7d", "lg0vh7lw", "gwl6w54q", "oq4odh5u", "nimpkrie", "nqg0l6g5"]},
+         {"name": "TabularMNEP", "run_ids": ["r0lgvjot", "lplvdwn7", "bgrpwb86", "qr3bl11p", "qthiiy63", "7so4f4az", "znqtqad5", "4bxqfud9", "ss2up9aq", "rd5xt1og"]}
+      ]
+   },
+   {
+      "reward_type": "ggi2",
+      "models": [
+         {"name": "GS", "run_ids": ["u5f6a335"]},
+         {"name": "GA", "run_ids": ["65bwbzfi", "h0bhhmqu", "75rxdy95", "z0l8jnx7", "t0vpv3f0", "j47n94nn", "b9416zcm", "swd8i3em", "e98sv4mh", "vq7odc56"]},
+         {"name": "DeepRL", "run_ids": ["6792khhp", "mztnn5b8", "ngccing5", "a6aawfrs", "hs117if4", "6tpxu3hl", "p8t61ghh", "svro6bwo", "ru3lbmwc", "5i3oxfqt"]},
+         {"name": "TabularMNEP", "run_ids": ["wehtku0v", "z2gexdjn", "8inbofzw", "f92d0cx0", "2lyj1jxj", "o2v4ew63", "sv7u4mpp", "gln95c6g", "3t5fng5p", "cf02kksw"]}
+      ]
+   },
+   {
+      "reward_type": "ggi4",
+      "models": [
+         {"name": "GS", "run_ids": ["9bcp2750"]},
+         {"name": "GA", "run_ids": ["b2oaakll", "e3jof51f", "dbwi5x31", "z2pjrd5d", "warschq1", "t6rwe4yc", "lx5x6uwy", "f5rjbawf", "0s3t8i2g", "v88boqql"]},
+         {"name": "DeepRL", "run_ids": ["gjncts17", "sg3bevw0", "v5yneeht", "4qjonxz6", "lxatlyoc", "fdf7o5fq", "0a65aqyu", "8noh4iy0", "2u4be340", "294bg8l7"]},
+         {"name": "TabularMNEP", "run_ids": ["ds3utz2j", "q8vp076l", "gve6arno", "ihix7n71", "wqcf4sv7", "eprthhm4", "gmv3blz5", "jlcooun3", "jcgfwqat", "fzyxjr2u"]}
+      ]
+   }
+]

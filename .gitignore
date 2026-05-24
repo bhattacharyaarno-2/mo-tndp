@@ -128,3 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .vscode/*
+
+# Experiment outputs and generated artifacts
+wandb/
+carbon_logs/
+q_tables/
+deep_models/
+.git.nested-backup/

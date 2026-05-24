@@ -1,0 +1,19 @@
+name: tabular-tndp
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - matplotlib
+  - pygame
+  - pyyaml
+  - wandb
+  - gymnasium
+  - pytorch
+  - pip
+  - pip:
+    - mo-gymnasium
+    - codecarbon
+

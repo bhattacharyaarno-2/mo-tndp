@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MO-TNDP Visualizer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Transport Network Explorer</p>
+          <h1>See how the MO-TNDP agent moves, chooses, and earns reward.</h1>
+          <p class="hero-copy">
+            Pick a learned policy, scrub through each station placement, and inspect the route, demand,
+            starting preference, and next valid moves in one place.
+          </p>
+        </div>
+        <div class="hero-metrics" id="hero-metrics"></div>
+      </section>
+
+      <section class="view-switcher">
+        <button id="view-playback" type="button">Playback</button>
+        <button id="view-library" type="button" class="secondary">Run Library</button>
+        <button id="view-manage" type="button" class="secondary">Manage Runs</button>
+      </section>
+
+      <div id="playback-view">
+        <section class="control-bar">
+          <label class="control">
+            <span>Policy</span>
+            <select id="model-select"></select>
+          </label>
+          <label class="control">
+            <span>Overlay</span>
+            <select id="overlay-select">
+              <option value="socioeconomic_groups">Socio-economic groups</option>
+              <option value="raw_house_prices">Average house prices</option>
+              <option value="aggregate_od">OD demand intensity</option>
+              <option value="q_best_value">Best Q value</option>
+              <option value="q_start">Starting value</option>
+            </select>
+          </label>
+          <label class="control control-grow">
+            <span>Timeline</span>
+            <input id="step-slider" type="range" min="0" max="0" value="0" />
+          </label>
+          <div class="button-row">
+            <button id="play-button" type="button">Play</button>
+            <button id="reset-button" type="button" class="secondary">Reset</button>
+          </div>
+          <label class="control speed-control">
+            <span>Speed</span>
+            <input id="speed-slider" type="range" min="200" max="1600" step="100" value="700" />
+          </label>
+          <label class="control checkbox-control">
+            <span>Amsterdam Base Map</span>
+            <label class="toggle-row">
+              <input id="map-toggle" type="checkbox" />
+              <span>Show map under the grid</span>
+            </label>
+          </label>
+        </section>
+
+        <section id="map-calibration-bar" class="control-bar hidden">
+          <label class="control">
+            <span>Map Opacity</span>
+            <input id="map-opacity-slider" type="range" min="0" max="100" step="5" value="45" />
+          </label>
+          <label class="control">
+            <span>Map Scale</span>
+            <input id="map-scale-slider" type="range" min="80" max="140" step="1" value="100" />
+          </label>
+          <label class="control">
+            <span>Map Offset X</span>
+            <input id="map-offset-x-slider" type="range" min="-240" max="240" step="2" value="0" />
+          </label>
+          <label class="control">
+            <span>Map Offset Y</span>
+            <input id="map-offset-y-slider" type="range" min="-240" max="240" step="2" value="0" />
+          </label>
+        </section>
+
+        <section class="content-grid">
+          <div class="map-stack">
+            <article class="panel map-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Live Map</p>
+                  <h2 id="panel-title">Route playback</h2>
+                </div>
+                <div class="step-pill" id="step-pill">Step 0</div>
+              </div>
+              <canvas id="map-canvas" width="1200" height="800"></canvas>
+              <div class="legend-row" id="legend-row"></div>
+            </article>
+
+            <article class="panel map-panel comparison-panel">
+              <div class="panel-header compact">
+                <div>
+                  <p class="panel-kicker">Comparison Map</p>
+                  <h2 id="comparison-title">Deep RL reference</h2>
+                </div>
+                <label class="control comparison-control">
+                  <span>Compare With</span>
+                  <select id="comparison-select"></select>
+                </label>
+              </div>
+              <p id="comparison-copy" class="decision-copy"></p>
+              <canvas id="comparison-canvas" width="1200" height="520"></canvas>
+              <div class="legend-row" id="comparison-legend"></div>
+            </article>
+          </div>
+
+          <aside class="side-column">
+            <article class="panel">
+              <p class="panel-kicker">Current Decision</p>
+              <h2 id="decision-title">Waiting for data</h2>
+              <p id="decision-copy" class="decision-copy"></p>
+              <div id="allowed-actions" class="chip-row"></div>
+            </article>
+
+            <article class="panel">
+              <p class="panel-kicker">Fairness View</p>
+              <div id="fairness-summary" class="fairness-summary"></div>
+              <div id="fairness-breakdown" class="fairness-breakdown"></div>
+            </article>
+
+            <article class="panel">
+              <p class="panel-kicker">Starting Cells</p>
+              <div id="top-starts" class="stack-list"></div>
+            </article>
+          </aside>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel">
+            <div class="panel-header compact">
+              <div>
+                <p class="panel-kicker">Step Log</p>
+                <h2>Every move at a glance</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Action</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Reward</th>
+                  </tr>
+                </thead>
+                <tbody id="step-table"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header compact">
+              <div>
+                <p class="panel-kicker">Model Details</p>
+                <h2>Run configuration</h2>
+              </div>
+            </div>
+            <div id="config-grid" class="config-grid"></div>
+          </article>
+        </section>
+      </div>
+
+      <section id="library-view" class="library-view hidden">
+        <article id="wandb-panel" class="panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">Run Library</p>
+              <h2>Saved runs and training parameters</h2>
+            </div>
+          </div>
+          <div id="library-grid" class="library-grid"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">WandB Details</p>
+              <h2 id="wandb-title">Select a run</h2>
+            </div>
+          </div>
+          <div id="wandb-summary-grid" class="library-meta"></div>
+          <div id="wandb-meta-grid" class="library-meta"></div>
+          <div id="wandb-charts-grid" class="wandb-charts-grid"></div>
+          <div id="wandb-media-grid" class="wandb-media-grid"></div>
+        </article>
+      </section>
+
+      <section id="manage-view" class="library-view hidden">
+        <article class="panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">Manage Runs</p>
+              <h2>Rename or hide dashboard entries</h2>
+            </div>
+            <button id="reset-run-management" type="button" class="secondary">Reset All</button>
+          </div>
+          <p class="decision-copy">
+            Rename and hide settings are stored in this browser. Hidden runs are removed from the dashboard menus,
+            but the checkpoint, W&B, and carbon log files stay on disk.
+          </p>
+          <div id="manage-grid" class="library-grid"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
