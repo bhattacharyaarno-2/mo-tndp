@@ -53,6 +53,8 @@ if ! "$CONDA_BIN" env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
 fi
 
 conda activate "$ENV_NAME"
+"$CONDA_BIN" install -y -c conda-forge "libstdcxx-ng>=12"
+export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 python -m pip install -e .
 python -m pip install --upgrade torch --index-url "$PYTORCH_INDEX_URL"
 python - <<'PY'

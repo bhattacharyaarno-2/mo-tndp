@@ -61,6 +61,8 @@ The setup script installs the CUDA PyTorch wheel from `https://download.pytorch.
 PYTORCH_INDEX_URL='https://download.pytorch.org/whl/cu128' bash tabular-tndp/jobs/snellius/setup_env.sh
 ```
 
+It also installs `libstdcxx-ng` from conda-forge and prepends `$CONDA_PREFIX/lib` to `LD_LIBRARY_PATH`, which avoids `GLIBCXX_... not found` errors from compiled Python wheels on Snellius.
+
 If the cluster module names differ, run `module avail 2>&1 | grep -Ei "mamba|conda|miniforge|python"` and edit the module section in `setup_env.sh`.
 
 If you see an Lmod message saying `Miniconda3`, `Anaconda3`, or `Mamba` exists but cannot be loaded as requested, ask Lmod for the exact prerequisite/module path:
