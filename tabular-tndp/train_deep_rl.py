@@ -115,10 +115,13 @@ def configure_env_args(args):
             args.reward_type = "ggi2"
         if args.chained_reward == DEFAULTS["chained_reward"]:
             args.chained_reward = True
-        if args.no_data_penalty == DEFAULTS["no_data_penalty"]:
-            args.no_data_penalty = 0.01
         if args.run_name == DEFAULTS["run_name"]:
             args.run_name = "amsterdam-dqn-freeze-v1"
+    elif args.env == "amsterdam_10x10":
+        args.city_path = resolve_city_path("amsterdam_10x10")
+        args.gym_env = "motndp_amsterdam_10x10-v0"
+        args.groups_file = f"price_groups_{args.nr_groups}.txt"
+        args.experiment_name = "Deep-RL-Amsterdam-10x10"
     elif args.env == "xian":
         args.city_path = resolve_city_path("xian")
         args.gym_env = "motndp_xian-v0"

@@ -12,6 +12,18 @@ from qlearning_tndp import QLearningTNDP
 import argparse
 import wandb
 
+
+def resolve_city_path(city_name):
+    candidates = [
+        Path(f"./cities/{city_name}"),
+        Path(f"./envs/mo-tndp/cities/{city_name}"),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(f"Could not find city data for {city_name}. Checked: {candidates}")
+
+
 def main(args):
     def make_env(gym_env):
         city = City(
@@ -84,6 +96,7 @@ def main(args):
             wandb_run_id=args.evaluate_model,
             Q_table=Q,
             Q_start_table=Q_start,
+            log=not args.no_log,
             ucb_c_qstart=args.ucb_c_qstart,
             ucb_c_q=args.ucb_c_q,
             update_method=args.update_method
@@ -112,6 +125,8 @@ def main(args):
             seed=args.seed,
             wandb_project_name=args.project_name,
             wandb_experiment_name=args.experiment_name,
+            wandb_run_id=args.run_id,
+            log=not args.no_log,
             ucb_c_qstart=args.ucb_c_qstart,
             ucb_c_q=args.ucb_c_q,
             update_method=args.update_method
@@ -121,7 +136,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tabular Q-learning for MO-TNDP")
-    # Acceptable values: 'dilemma', 'margins', 'amsterdam'
+    # Acceptable values: 'dilemma', 'margins', 'amsterdam', 'amsterdam_10x10'
     parser.add_argument('--env', default='dilemma', type=str)
     # For xian/amsterdam environment we have different groups files (different nr of objectives)
     parser.add_argument('--nr_groups', default=5, type=int)
@@ -149,6 +164,7 @@ if __name__ == "__main__":
     parser.add_argument('--ucb_c_qstart', default=None, type=float)
     parser.add_argument('--ucb_c_q', default=None, type=float)
     parser.add_argument('--seed', default=42, type=int)
+    parser.add_argument('--run_id', default=None, type=str, help="Optional W&B run id, also used for saved q_tables filenames.")
     parser.add_argument('--evaluate_model', default=None, type=str, help="Wandb run ID for model to evaluate. Will load the Q table and run --test_episodes. Note that starting_loc will be set to the one with the max Q.") 
     parser.add_argument('--update_method', default='td', type=str, choices=['td', 'mc'])
 
@@ -167,29 +183,36 @@ if __name__ == "__main__":
 
     # Some values are hardcoded for each environment (this is flexible, but we don't want to have to pass 100 arguments to the script)
     if args.env == 'dilemma':
-        args.city_path = Path(f"./envs/mo-tndp/cities/dilemma_5x5")
+        args.city_path = resolve_city_path("dilemma_5x5")
         args.nr_stations = 9
         args.gym_env = 'motndp_dilemma-v0'
         args.groups_file = "groups.txt"
         args.ignore_existing_lines = args.ignore_existing_lines
         args.experiment_name = "Q-Learning-Dilemma"
     elif args.env == 'margins':
-        args.city_path = Path(f"./envs/mo-tndp/cities/margins_5x5")
+        args.city_path = resolve_city_path("margins_5x5")
         args.nr_stations = 9
         args.gym_env = 'motndp_margins-v0'
         args.groups_file = f"groups.txt"
         args.ignore_existing_lines = args.ignore_existing_lines
         args.experiment_name = "Q-Learning-Margins"
     elif args.env == 'amsterdam':
-        args.city_path = Path(f"./envs/mo-tndp/cities/amsterdam")
+        args.city_path = resolve_city_path("amsterdam")
         args.nr_stations = args.nr_stations
         args.gym_env = 'motndp_amsterdam-v0'
         args.groups_file = f"price_groups_{args.nr_groups}.txt"
         args.ignore_existing_lines = args.ignore_existing_lines
         args.experiment_name = "Q-Learning-Amsterdam"
+    elif args.env == 'amsterdam_10x10':
+        args.city_path = resolve_city_path("amsterdam_10x10")
+        args.nr_stations = args.nr_stations
+        args.gym_env = 'motndp_amsterdam_10x10-v0'
+        args.groups_file = f"price_groups_{args.nr_groups}.txt"
+        args.ignore_existing_lines = args.ignore_existing_lines
+        args.experiment_name = "Q-Learning-Amsterdam-10x10"
     elif args.env == 'xian':
         # Xian pre-defined
-        args.city_path = Path(f"./envs/mo-tndp/cities/xian")
+        args.city_path = resolve_city_path("xian")
         args.nr_stations = args.nr_stations
         args.gym_env = 'motndp_xian-v0'
         args.groups_file = f"price_groups_{args.nr_groups}.txt"

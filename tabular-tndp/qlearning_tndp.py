@@ -1,4 +1,5 @@
 from collections import deque
+import json
 import wandb
 import numpy as np
 import matplotlib.pyplot as plt
@@ -212,10 +213,14 @@ class QLearningTNDP:
         return np.sum(sorted_reward * weights)
 
     def train(self, reward_type, starting_loc=None):
-        tracker = EmissionsTracker(output_dir="carbon_logs", project_name=wandb.run.id)
+        run_id = wandb.run.id if self.log and wandb.run else (
+            self.wandb_run_id or f"{self.env_id}-{self.seed}-{int(time.time())}"
+        )
+        tracker = EmissionsTracker(output_dir="carbon_logs", project_name=run_id)
         tracker.start()
 
-        wandb.config['reward_type'] = reward_type
+        if self.log:
+            wandb.config['reward_type'] = reward_type
         
         if self.exploration_type != 'ucb':
             self.Q_start = np.full((self.env.unwrapped.city.grid_x_size, self.env.unwrapped.city.grid_y_size), self.q_start_initial_value, dtype=np.float64)
@@ -382,16 +387,28 @@ class QLearningTNDP:
                 
         tracker.stop()
             
+        if not self.log:
+            final_Q_table = Path(f"./q_tables/{run_id}.npy")
+            np.save(final_Q_table, self.Q)
+            final_Q_start_table = Path(f"./q_tables/{run_id}_qstart.npy")
+            np.save(final_Q_start_table, self.Q_start)
+            config_path = Path(f"./q_tables/{run_id}.json")
+            config = self.get_config()
+            config["reward_type"] = reward_type
+            config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
+            if self.test_episodes > 0:
+                self.test(self.test_episodes, reward_type, starting_loc, policy=self.policy)
         
         if self.log:
             # Log the final Q-table
             final_Q_table = Path(f"./q_tables/{wandb.run.id}.npy")
             np.save(final_Q_table, self.Q)
-            wandb.save(final_Q_table.as_posix())
             
             # Log the final Q-start table
             final_Q_start_table = Path(f"./q_tables/{wandb.run.id}_qstart.npy")
             np.save(final_Q_start_table, self.Q_start)
+
+            wandb.save(final_Q_table.as_posix())
             wandb.save(final_Q_start_table.as_posix())
             
             # Log the Q-table as an image
@@ -497,7 +514,8 @@ class QLearningTNDP:
             test_starting_loc = np.unravel_index(self.Q_start.argmax(), self.Q_start.shape)
 
         for episode in range(test_episodes):
-            state, info = self.env.reset(options={'loc': test_starting_loc})
+            _, info = self.env.reset(options={'loc': test_starting_loc})
+            state = int(info['location_grid_index'])
             locations = [info['location_grid_coordinates'].tolist()]
             actions = []
             episode_reward = 0
@@ -509,12 +527,13 @@ class QLearningTNDP:
                     action = policy[episode_step]
                 else:
                     # action = np.argmax(self.Q[state_index, :] - 10000000 * (1-info['action_mask'].astype(np.int64)))
-                    action = np.argmax(np.where(info['action_mask'], self.Q[int(state), :], -np.inf))
+                    action = np.argmax(np.where(info['action_mask'], self.Q[state, :], -np.inf))
                     
                     action = action.item()
                 
                 actions.append(action)
-                new_state, reward, done, _, info = self.env.step(action)
+                _, reward, done, _, info = self.env.step(action)
+                new_state = int(info['location_grid_index'])
                 locations.append(info['location_grid_coordinates'].tolist())
                 episode_satisfied_ods_by_group += reward
                 episode_reward += self.calculate_reward(reward, reward_type)

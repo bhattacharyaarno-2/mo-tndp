@@ -92,7 +92,7 @@ def _city_name_from_env_id(env_id):
 
 
 def _groups_file_for_city(city_name, nr_groups):
-    if city_name in {"amsterdam", "xian"}:
+    if city_name in {"amsterdam", "amsterdam_10x10", "xian"}:
         return f"price_groups_{nr_groups}.txt"
     return "groups.txt"
 
@@ -157,7 +157,7 @@ def _socioeconomic_values_from_prices(city_path, overlay_grid):
 
 
 def _socioeconomic_overlay(city_name, city_path, fallback_groups):
-    if city_name in {"amsterdam", "xian"}:
+    if city_name in {"amsterdam", "amsterdam_10x10", "xian"}:
         overlay_file = city_path / "price_groups_5.txt"
         if overlay_file.exists():
             overlay_city = City(city_path, groups_file=overlay_file.name, ignore_existing_lines=True)
@@ -182,6 +182,7 @@ def _socioeconomic_overlay(city_name, city_path, fallback_groups):
 
 def _load_run_config(run_id, repo_root):
     matches = sorted(repo_root.glob(f"wandb/run-*-{run_id}/files/config.yaml"))
+    matches += sorted(repo_root.glob(f"wandb/offline-run-*-{run_id}/files/config.yaml"))
     if not matches:
         return None
 
@@ -193,6 +194,16 @@ def _load_run_config(run_id, repo_root):
         if isinstance(value, dict) and "value" in value:
             config[key] = value["value"]
     return config
+
+
+def _load_local_run_config(run_id, repo_root):
+    candidates = [
+        repo_root / "q_tables" / f"{run_id}.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return json.loads(candidate.read_text(encoding="utf-8"))
+    return None
 
 
 def _relative_dashboard_path(path, repo_root):
@@ -496,7 +507,9 @@ def _discover_tabular_models(repo_root):
             continue
 
         run_id = q_path.stem
-        config = _load_run_config(run_id, repo_root)
+        if run_id.startswith("smoke-"):
+            continue
+        config = _load_run_config(run_id, repo_root) or _load_local_run_config(run_id, repo_root)
         if not config:
             continue
 
@@ -519,6 +532,8 @@ def _discover_deep_models(repo_root):
 
     models = []
     for checkpoint_path in sorted((repo_root / "deep_models").glob("*.pt")):
+        if checkpoint_path.stem.startswith("smoke-"):
+            continue
         checkpoint = torch.load(checkpoint_path, map_location="cpu")
         config = checkpoint.get("config")
         if not config:
@@ -865,6 +880,20 @@ def _serialize_model(model, repo_root):
 
 
 def _default_comparison_model(models, selected_model):
+    apple_pairs = {
+        "tabular-rl-apple": "deep-rl-apple",
+        "deep-rl-apple": "tabular-rl-apple",
+        "tabular-rl-orange": "deep-rl-orange",
+        "deep-rl-orange": "tabular-rl-orange",
+        "tabular-rl-amsterdam-10x10-20k": "deep-rl-amsterdam-10x10-20k",
+        "deep-rl-amsterdam-10x10-20k": "tabular-rl-amsterdam-10x10-20k",
+        "tabular-rl-amsterdam-10x10-20k-rawls": "deep-rl-amsterdam-10x10-20k-rawls",
+        "deep-rl-amsterdam-10x10-20k-rawls": "tabular-rl-amsterdam-10x10-20k-rawls",
+    }
+    paired_model_id = apple_pairs.get(selected_model["id"])
+    if paired_model_id and any(model["id"] == paired_model_id for model in models):
+        return paired_model_id
+
     same_city = [model for model in models if model["city_name"] == selected_model["city_name"] and model["id"] != selected_model["id"]]
     if not same_city:
         return None

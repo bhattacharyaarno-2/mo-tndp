@@ -134,4 +134,6 @@ wandb/
 carbon_logs/
 q_tables/
 deep_models/
+eval/
+logs/
 .git.nested-backup/
