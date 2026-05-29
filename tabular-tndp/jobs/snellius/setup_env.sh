@@ -64,6 +64,7 @@ import motndp
 
 print("Environment OK")
 print("torch", torch.__version__, "cuda_available", torch.cuda.is_available())
-if not torch.cuda.is_available():
-    raise SystemExit("Torch installed, but CUDA is not available. Check the PyTorch CUDA wheel and GPU allocation.")
+print("torch_cuda_built", torch.version.cuda)
+if torch.version.cuda is None:
+    raise SystemExit("Torch installed, but it is not a CUDA build. Check the PyTorch CUDA wheel index.")
 PY
