@@ -68,7 +68,7 @@ module spider Mamba
 Then retry with the exact module name it prints:
 
 ```bash
-CONDA_MODULE='Miniconda3/<exact-version-or-path>' bash tabular-tndp/jobs/snellius/setup_env.sh
+CONDA_MODULE_STACK='2025' CONDA_MODULE='Miniconda3/<exact-version-or-path>' bash tabular-tndp/jobs/snellius/setup_env.sh
 ```
 
 Use the same `CONDA_MODULE=...` prefix when submitting jobs if the batch script cannot auto-load conda.

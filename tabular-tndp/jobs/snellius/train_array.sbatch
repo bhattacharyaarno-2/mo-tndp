@@ -27,6 +27,9 @@ mkdir -p logs q_tables deep_models eval carbon_logs wandb
 if command -v module >/dev/null 2>&1; then
     module purge >/dev/null 2>&1 || true
     if [ -n "${CONDA_MODULE:-}" ]; then
+        if [ -n "${CONDA_MODULE_STACK:-}" ]; then
+            module load "$CONDA_MODULE_STACK"
+        fi
         module load "$CONDA_MODULE"
     else
         for stack in 2025 2024 2023 2022; do

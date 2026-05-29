@@ -8,6 +8,9 @@ cd "$(dirname "$0")/../../.."
 if command -v module >/dev/null 2>&1; then
     module purge >/dev/null 2>&1 || true
     if [ -n "${CONDA_MODULE:-}" ]; then
+        if [ -n "${CONDA_MODULE_STACK:-}" ]; then
+            module load "$CONDA_MODULE_STACK"
+        fi
         module load "$CONDA_MODULE"
     else
         for stack in 2025 2024 2023 2022; do
@@ -31,7 +34,7 @@ else
     echo "  module spider Anaconda3"
     echo "  module spider Mamba"
     echo "Then retry, for example:"
-    echo "  CONDA_MODULE='Miniconda3/<version-or-full-path-from-module-spider>' bash tabular-tndp/jobs/snellius/setup_env.sh"
+    echo "  CONDA_MODULE_STACK='2025' CONDA_MODULE='Miniconda3/<version-or-full-path-from-module-spider>' bash tabular-tndp/jobs/snellius/setup_env.sh"
     exit 1
 fi
 
