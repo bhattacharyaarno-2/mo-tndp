@@ -84,8 +84,8 @@ For offline logging, submit with `--wandb-mode offline`.
 ## 4. Smoke test before burning budget
 
 ```bash
-sbatch tabular-tndp/jobs/snellius/train_array.sbatch qlearning amsterdam 2 42 1
-sbatch tabular-tndp/jobs/snellius/train_array.sbatch deep_rl amsterdam 2 42 1
+bash tabular-tndp/jobs/snellius/submit_sweep.sh qlearning amsterdam 2 42 1
+bash tabular-tndp/jobs/snellius/submit_sweep.sh deep_rl amsterdam 2 42 1
 ```
 
 Watch:

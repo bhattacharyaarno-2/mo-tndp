@@ -19,10 +19,12 @@ case "$MODEL" in
     qlearning)
         DEFAULT_PARTITION=rome
         DEFAULT_TIME=120:00:00
+        DEFAULT_GPUS_PER_NODE=
         ;;
     deep_rl)
         DEFAULT_PARTITION=gpu_mig
         DEFAULT_TIME=120:00:00
+        DEFAULT_GPUS_PER_NODE=1
         ;;
     *)
         echo "Unknown model: $MODEL"
@@ -32,10 +34,18 @@ esac
 
 PARTITION="${PARTITION:-$DEFAULT_PARTITION}"
 TIME="${TIME:-$DEFAULT_TIME}"
+GPUS_PER_NODE="${GPUS_PER_NODE:-$DEFAULT_GPUS_PER_NODE}"
 
-sbatch \
-    --partition="$PARTITION" \
-    --time="$TIME" \
-    --array="0-${ARRAY_END}" \
+SBATCH_ARGS=(
+    --partition="$PARTITION"
+    --time="$TIME"
+    --array="0-${ARRAY_END}"
+)
+
+if [ -n "$GPUS_PER_NODE" ]; then
+    SBATCH_ARGS+=(--gpus-per-node="$GPUS_PER_NODE")
+fi
+
+sbatch "${SBATCH_ARGS[@]}" \
     "$SCRIPT_DIR/train_array.sbatch" \
     "$MODEL" "$ENV_NAME" "$EPISODES" "$SEED_START" "$SEED_COUNT"
