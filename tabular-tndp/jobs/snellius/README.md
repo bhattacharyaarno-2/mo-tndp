@@ -114,6 +114,7 @@ Useful environment overrides:
 ```bash
 PARTITION=rome TIME=120:00:00 bash tabular-tndp/jobs/snellius/submit_sweep.sh qlearning amsterdam 100000 42 10
 PARTITION=gpu_a100 TIME=120:00:00 bash tabular-tndp/jobs/snellius/submit_sweep.sh deep_rl amsterdam 100000 42 10
+CPUS_PER_TASK=8 GPUS_PER_NODE=1 bash tabular-tndp/jobs/snellius/submit_sweep.sh deep_rl amsterdam 100000 42 10
 WANDB_MODE=offline bash tabular-tndp/jobs/snellius/submit_sweep.sh deep_rl amsterdam 100000 42 10
 ```
 

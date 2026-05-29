@@ -20,11 +20,13 @@ case "$MODEL" in
         DEFAULT_PARTITION=rome
         DEFAULT_TIME=120:00:00
         DEFAULT_GPUS_PER_NODE=
+        DEFAULT_CPUS_PER_TASK=16
         ;;
     deep_rl)
         DEFAULT_PARTITION=gpu_mig
         DEFAULT_TIME=120:00:00
         DEFAULT_GPUS_PER_NODE=1
+        DEFAULT_CPUS_PER_TASK=8
         ;;
     *)
         echo "Unknown model: $MODEL"
@@ -35,10 +37,12 @@ esac
 PARTITION="${PARTITION:-$DEFAULT_PARTITION}"
 TIME="${TIME:-$DEFAULT_TIME}"
 GPUS_PER_NODE="${GPUS_PER_NODE:-$DEFAULT_GPUS_PER_NODE}"
+CPUS_PER_TASK="${CPUS_PER_TASK:-$DEFAULT_CPUS_PER_TASK}"
 
 SBATCH_ARGS=(
     --partition="$PARTITION"
     --time="$TIME"
+    --cpus-per-task="$CPUS_PER_TASK"
     --array="0-${ARRAY_END}"
 )
 
