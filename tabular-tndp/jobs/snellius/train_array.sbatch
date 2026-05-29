@@ -20,9 +20,16 @@ SEED=$((SEED_START + TASK_ID))
 RUN_STAMP="$(date +%Y%m%d-%H%M%S)"
 CONDA_ENV="${MO_TNDP_ENV:-mo-tndp}"
 WANDB_MODE="${WANDB_MODE:-online}"
+CONDA_MODULE_STACK="${CONDA_MODULE_STACK:-2025}"
+CONDA_MODULE="${CONDA_MODULE:-Miniconda3/25.5.1-1}"
 
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 mkdir -p logs q_tables deep_models eval carbon_logs wandb
+
+if ! command -v module >/dev/null 2>&1; then
+    source /etc/profile.d/modules.sh >/dev/null 2>&1 || true
+    source /usr/share/lmod/lmod/init/bash >/dev/null 2>&1 || true
+fi
 
 if command -v module >/dev/null 2>&1; then
     module purge >/dev/null 2>&1 || true

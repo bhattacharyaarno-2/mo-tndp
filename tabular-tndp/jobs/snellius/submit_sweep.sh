@@ -43,6 +43,7 @@ SBATCH_ARGS=(
     --partition="$PARTITION"
     --time="$TIME"
     --cpus-per-task="$CPUS_PER_TASK"
+    --export=ALL
     --array="0-${ARRAY_END}"
 )
 

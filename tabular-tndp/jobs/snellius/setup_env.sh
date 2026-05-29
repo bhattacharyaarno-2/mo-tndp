@@ -2,8 +2,15 @@
 set -euo pipefail
 
 ENV_NAME="${MO_TNDP_ENV:-mo-tndp}"
+CONDA_MODULE_STACK="${CONDA_MODULE_STACK:-2025}"
+CONDA_MODULE="${CONDA_MODULE:-Miniconda3/25.5.1-1}"
 
 cd "$(dirname "$0")/../../.."
+
+if ! command -v module >/dev/null 2>&1; then
+    source /etc/profile.d/modules.sh >/dev/null 2>&1 || true
+    source /usr/share/lmod/lmod/init/bash >/dev/null 2>&1 || true
+fi
 
 if command -v module >/dev/null 2>&1; then
     module purge >/dev/null 2>&1 || true
