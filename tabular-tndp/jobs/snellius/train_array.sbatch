@@ -25,9 +25,18 @@ cd "${SLURM_SUBMIT_DIR:-$PWD}"
 mkdir -p logs q_tables deep_models eval carbon_logs wandb
 
 if command -v module >/dev/null 2>&1; then
-    module purge || true
-    module load 2023 || true
-    module load Miniconda3 || module load Anaconda3 || module load Mamba || module load miniforge || true
+    module purge >/dev/null 2>&1 || true
+    if [ -n "${CONDA_MODULE:-}" ]; then
+        module load "$CONDA_MODULE"
+    else
+        for stack in 2025 2024 2023 2022; do
+            module load "$stack" >/dev/null 2>&1 || true
+            for candidate in Miniconda3 Anaconda3 Mamba miniconda3 anaconda3 mamba; do
+                module load "$candidate" >/dev/null 2>&1 && break 2
+            done
+            module purge >/dev/null 2>&1 || true
+        done
+    fi
 fi
 
 if command -v mamba >/dev/null 2>&1; then
@@ -35,7 +44,7 @@ if command -v mamba >/dev/null 2>&1; then
 elif command -v conda >/dev/null 2>&1; then
     CONDA_BIN=conda
 else
-    echo "Could not find conda or mamba."
+    echo "Could not find conda or mamba. Set CONDA_MODULE to the exact module from 'module spider Miniconda3'."
     exit 1
 fi
 

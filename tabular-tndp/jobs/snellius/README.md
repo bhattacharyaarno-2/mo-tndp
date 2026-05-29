@@ -57,6 +57,22 @@ bash tabular-tndp/jobs/snellius/setup_env.sh
 
 If the cluster module names differ, run `module avail 2>&1 | grep -Ei "mamba|conda|miniforge|python"` and edit the module section in `setup_env.sh`.
 
+If you see an Lmod message saying `Miniconda3`, `Anaconda3`, or `Mamba` exists but cannot be loaded as requested, ask Lmod for the exact prerequisite/module path:
+
+```bash
+module spider Miniconda3
+module spider Anaconda3
+module spider Mamba
+```
+
+Then retry with the exact module name it prints:
+
+```bash
+CONDA_MODULE='Miniconda3/<exact-version-or-path>' bash tabular-tndp/jobs/snellius/setup_env.sh
+```
+
+Use the same `CONDA_MODULE=...` prefix when submitting jobs if the batch script cannot auto-load conda.
+
 For online W&B logging:
 
 ```bash
