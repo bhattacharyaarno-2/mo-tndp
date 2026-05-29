@@ -69,10 +69,19 @@ export MKL_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
 echo "host=$(hostname)"
 echo "model=$MODEL env=$ENV_NAME episodes=$TRAIN_EPISODES seed=$SEED task=$TASK_ID/$SEED_COUNT"
 echo "partition=${SLURM_JOB_PARTITION:-unknown} cpus=${SLURM_CPUS_PER_TASK:-unknown} cuda=${CUDA_VISIBLE_DEVICES:-none} wandb=$WANDB_MODE"
-python - <<'PY'
+if [ "$MODEL" = "deep_rl" ]; then
+    python - <<'PY'
+import torch
+print("torch_cuda_available=", torch.cuda.is_available(), "cuda_device_count=", torch.cuda.device_count(), flush=True)
+if not torch.cuda.is_available():
+    raise SystemExit("Deep RL requires CUDA on Snellius. Rerun setup_env.sh to install the CUDA-enabled PyTorch wheel.")
+PY
+else
+    python - <<'PY'
 import torch
 print("torch_cuda_available=", torch.cuda.is_available(), "cuda_device_count=", torch.cuda.device_count(), flush=True)
 PY
+fi
 
 case "$ENV_NAME" in
     amsterdam)

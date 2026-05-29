@@ -4,6 +4,7 @@ set -euo pipefail
 ENV_NAME="${MO_TNDP_ENV:-mo-tndp}"
 CONDA_MODULE_STACK="${CONDA_MODULE_STACK:-2025}"
 CONDA_MODULE="${CONDA_MODULE:-Miniconda3/25.5.1-1}"
+PYTORCH_INDEX_URL="${PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cu126}"
 
 cd "$(dirname "$0")/../../.."
 
@@ -53,6 +54,7 @@ fi
 
 conda activate "$ENV_NAME"
 python -m pip install -e .
+python -m pip install --upgrade torch --index-url "$PYTORCH_INDEX_URL"
 python - <<'PY'
 import mo_gymnasium
 import numpy
@@ -62,4 +64,6 @@ import motndp
 
 print("Environment OK")
 print("torch", torch.__version__, "cuda_available", torch.cuda.is_available())
+if not torch.cuda.is_available():
+    raise SystemExit("Torch installed, but CUDA is not available. Check the PyTorch CUDA wheel and GPU allocation.")
 PY
