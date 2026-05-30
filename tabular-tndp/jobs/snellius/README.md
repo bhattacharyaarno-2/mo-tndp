@@ -136,3 +136,27 @@ Smallest Snellius allocations are charged in chunks. Rough guide:
 - `gpu_h100`: smallest GPU allocation is 192 SBU/hour.
 
 So first measure episode throughput from the smoke-test logs, then scale the episode count and partition.
+
+## Export Results To The Dashboard
+
+After jobs finish, package Snellius outputs from the repo root:
+
+```bash
+bash tabular-tndp/jobs/snellius/pack_results.sh
+```
+
+This creates `snellius-results-<timestamp>.tar.gz` plus a `.manifest.txt` listing what is inside.
+
+Download the archive to your laptop. If direct Snellius SSH is blocked, try a jump through the doornode:
+
+```powershell
+scp -J <username>@doornode.hpcv.surf.nl <username>@snellius.surf.nl:~/mo-tndp/snellius-results-*.tar.gz .
+```
+
+Then import it locally from the repository root:
+
+```powershell
+.\dashboard\import_snellius_results.ps1 -Archive .\snellius-results-<timestamp>.tar.gz
+```
+
+The importer extracts `q_tables/`, `deep_models/`, `wandb/`, `eval/`, `carbon_logs/`, and `logs/`, then regenerates `dashboard/data.js`.
