@@ -202,7 +202,7 @@ def _load_local_run_config(run_id, repo_root):
     ]
     for candidate in candidates:
         if candidate.exists():
-            return json.loads(candidate.read_text(encoding="utf-8"))
+            return json.loads(candidate.read_text(encoding="utf-8-sig"))
     return None
 
 
