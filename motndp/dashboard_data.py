@@ -181,8 +181,8 @@ def _socioeconomic_overlay(city_name, city_path, fallback_groups):
 
 
 def _load_run_config(run_id, repo_root):
-    matches = sorted(repo_root.glob(f"wandb/run-*-{run_id}/files/config.yaml"))
-    matches += sorted(repo_root.glob(f"wandb/offline-run-*-{run_id}/files/config.yaml"))
+    matches = sorted(repo_root.glob(f"wandb/**/run-*-{run_id}/files/config.yaml"))
+    matches += sorted(repo_root.glob(f"wandb/**/offline-run-*-{run_id}/files/config.yaml"))
     if not matches:
         return None
 
@@ -225,7 +225,7 @@ def _coerce_json_value(value):
 
 
 def _wandb_run_directory(repo_root, run_id):
-    matches = sorted(repo_root.glob(f"wandb/run-*-{run_id}")) + sorted(repo_root.glob(f"wandb/offline-run-*-{run_id}"))
+    matches = sorted(repo_root.glob(f"wandb/**/run-*-{run_id}")) + sorted(repo_root.glob(f"wandb/**/offline-run-*-{run_id}"))
     return matches[-1] if matches else None
 
 

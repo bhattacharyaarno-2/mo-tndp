@@ -24,7 +24,8 @@ CONDA_MODULE_STACK="${CONDA_MODULE_STACK:-2025}"
 CONDA_MODULE="${CONDA_MODULE:-Miniconda3/25.5.1-1}"
 
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
-mkdir -p logs q_tables deep_models eval carbon_logs wandb
+WANDB_DIR="$PWD/wandb/${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-manual}}_${TASK_ID}"
+mkdir -p logs q_tables deep_models eval carbon_logs "$WANDB_DIR"
 
 if ! command -v module >/dev/null 2>&1; then
     source /etc/profile.d/modules.sh >/dev/null 2>&1 || true
@@ -62,6 +63,7 @@ eval "$("$CONDA_BIN" shell.bash hook)"
 conda activate "$CONDA_ENV"
 
 export WANDB_MODE
+export WANDB_DIR
 export PYTHONUNBUFFERED=1
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
