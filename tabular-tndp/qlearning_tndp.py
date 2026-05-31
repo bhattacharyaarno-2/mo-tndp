@@ -386,16 +386,17 @@ class QLearningTNDP:
                     logged_starting_loc_avg_reward_end_exploration = True
                 
         tracker.stop()
-            
+
+        config_path = Path(f"./q_tables/{run_id}.json")
+        config = self.get_config()
+        config["reward_type"] = reward_type
+        config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
+
         if not self.log:
             final_Q_table = Path(f"./q_tables/{run_id}.npy")
             np.save(final_Q_table, self.Q)
             final_Q_start_table = Path(f"./q_tables/{run_id}_qstart.npy")
             np.save(final_Q_start_table, self.Q_start)
-            config_path = Path(f"./q_tables/{run_id}.json")
-            config = self.get_config()
-            config["reward_type"] = reward_type
-            config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
             if self.test_episodes > 0:
                 self.test(self.test_episodes, reward_type, starting_loc, policy=self.policy)
         
