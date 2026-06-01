@@ -18,6 +18,9 @@ if (-not (Test-Path -LiteralPath $Python)) {
 }
 
 & $Python -m motndp.dashboard_data --output dashboard\data.js
+if ($LASTEXITCODE -ne 0) {
+    throw "Dashboard regeneration failed with exit code $LASTEXITCODE"
+}
 
 Write-Host "Imported $Archive"
 Write-Host "Regenerated dashboard\data.js"

@@ -306,6 +306,8 @@ def _wandb_history_series(run_dir):
             for key in series:
                 if key in row:
                     series[key].append([float(x_value), float(row[key])])
+    except Exception:
+        return {}
     finally:
         datastore.close()
 
@@ -360,6 +362,8 @@ def _wandb_system_series(run_dir):
                 scalar_value = _parse_json_scalar(item.value_json)
                 if scalar_value is not None:
                     series[item.key].append([float(elapsed_seconds), float(scalar_value)])
+    except Exception:
+        return {}
     finally:
         datastore.close()
 
